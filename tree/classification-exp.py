@@ -26,6 +26,9 @@ print("Precision for Class 1:", precision(y_pred, y_test, 1))
 print("Recall for Class 1:", recall(y_pred, y_test, 1),"\n")
 
 
+from sklearn.model_selection import KFold
+
+# Define cross-validation parameters
 max_depth = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 k = 5  # Number of folds
 accuracies = []
@@ -34,41 +37,38 @@ accuracies = []
 def compute_accuracy(y_true, y_pred):
     return accuracy_score(y_true, y_pred)
 
+# Initialize KFold
+kf = KFold(n_splits=k, shuffle=True, random_state=42)
+
 # Cross-validation loop
 for depth in max_depth:
-    fold_size = int(len(X) / k)
     fold_accuracies = []
 
-    for i in range(k):
-        test_start = i * fold_size
-        test_end = (i + 1) * fold_size
-        
-        # Create test and train sets
-        test_set = X[test_start:test_end]
-        test_labels = y[test_start:test_end]
+    for train_index, val_index in kf.split(X):
+        # Split data into training and validation sets
+        X_train, X_val = X[train_index], X[val_index]
+        y_train, y_val = y[train_index], y[val_index]
 
-        train_set = np.concatenate([X[:test_start], X[test_end:]])
-        train_labels = np.concatenate([y[:test_start], y[test_end:]])
-        
         # Convert to DataFrame and Series
-        train_set = pd.DataFrame(train_set)
-        train_labels = pd.Series(train_labels)
-        test_set = pd.DataFrame(test_set)
-        test_labels = pd.Series(test_labels)
+        X_train = pd.DataFrame(X_train)
+        y_train = pd.Series(y_train)
+        X_val = pd.DataFrame(X_val)
+        y_val = pd.Series(y_val)
 
         # Train and predict with DecisionTree
         tree = DecisionTree(criterion='gini_index', max_depth=depth)
-        tree.fit(train_set, train_labels)
-        y_pred = tree.predict(test_set)
+        tree.fit(X_train, y_train)
+        y_pred = tree.predict(X_val)
         
         # Compute accuracy
-        accuracy_ = compute_accuracy(test_labels, y_pred)
+        accuracy_ = compute_accuracy(y_val, y_pred)
         fold_accuracies.append(accuracy_)
 
     # Calculate average accuracy for this depth
     mean_accuracy = np.mean(fold_accuracies)
     accuracies.append((depth, mean_accuracy))
 
+# Find the best depth
 best_depth = None
 best_accuracy = -np.inf
 
@@ -80,6 +80,7 @@ for depth, accuracy in accuracies:
 print(f"Best max_depth: {best_depth}")
 print(f"Best cross-validation accuracy: {best_accuracy:.2f}")
 
+# Plot the results
 depths, scores = zip(*accuracies)
 plt.plot(depths, scores, marker='o')
 plt.xlabel('Max Depth')
