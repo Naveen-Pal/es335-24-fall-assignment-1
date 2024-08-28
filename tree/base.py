@@ -66,7 +66,11 @@ class DecisionTree:
             first_feature = X.columns[0]
             if not check_ifreal(X[first_feature]):
                 # Discrete feature
-                best_feature = opt_split_attribute(X, y, self.criterion)
+                if check_ifreal(y):
+                    best_feature = self.opt_split_discrete_mse(X, y)
+                else:
+                    best_feature = opt_split_attribute(X, y, self.criterion)
+                    
                 node.feature = best_feature
                 unique_values = X[best_feature].unique()
 
@@ -122,6 +126,29 @@ class DecisionTree:
                     best_feature = feature
 
         return best_feature, best_split
+    
+    def opt_split_discrete_mse(self, X: pd.DataFrame, y: pd.Series) -> str:
+        """
+        Function to find the best split for discrete features for regression (Discrete Input, Real Output).
+        """
+        best_gain = -np.inf
+        best_feature = None
+
+        for feature in X.columns:
+            unique_values = X[feature].unique()
+            total_mse = 0
+            for val in unique_values:
+                subset_y = y[X[feature] == val]
+                mse_val = mse(subset_y)
+                total_mse += len(subset_y) / len(y) * mse_val
+
+            gain = mse(y) - total_mse
+
+            if gain > best_gain:
+                best_gain = gain
+                best_feature = feature
+
+        return best_feature
 
     def opt_split_real(self, X: pd.DataFrame, y: pd.Series) -> Tuple[str, float]:
         """
