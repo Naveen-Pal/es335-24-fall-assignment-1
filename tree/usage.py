@@ -16,7 +16,7 @@ from metrics import *
 np.random.seed(42)
 
 # Test case 1: Real Input and Real Output
-# print("### Test case 1: Real Input and Real Output ###\n")
+print("### Test case 1: Real Input and Real Output ###\n")
 N = 30
 P = 5
 X = pd.DataFrame(np.random.randn(N, P))
@@ -24,7 +24,7 @@ y = pd.Series(np.random.randn(N))
 
 for criteria in ["information_gain", "gini_index"]:
     print(f"Running Decision Tree with {criteria} criterion...\n")
-    tree = DecisionTree(criterion=criteria)
+    tree = DecisionTree()
     tree.fit(X, y)
     y_hat = tree.predict(X)
     tree.plot()
