@@ -46,6 +46,7 @@ for folder in folders:
 X_train = np.array(X_train)
 y_train = np.array(y_train)
 
+print(X_train.shape)
 
 #=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-==-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
                                                 # Test Dataset
@@ -58,7 +59,9 @@ dataset_dir = os.path.join(combined_dir,"Test")
 for folder in folders:
     files = os.listdir(os.path.join(dataset_dir,folder))
     for file in files:
-
+        if '.ipynb_checkpoints' in file:
+                    # print("skipped")  
+            continue
         df = pd.read_csv(os.path.join(dataset_dir,folder,file),sep=",",header=0)
         df = df[offset:offset+time*50]
         X_test.append(df.values)
@@ -76,6 +79,7 @@ y_test = np.array(y_test)
 # concatenate the training and testing data
 X = np.concatenate((X_train,X_test))
 y = np.concatenate((y_train,y_test))
+print(X.shape)
 
 # split the data into training and testing sets. Change the seed value to obtain different random splits.
 seed = 4

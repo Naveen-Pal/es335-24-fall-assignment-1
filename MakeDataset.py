@@ -59,7 +59,9 @@ dataset_dir = os.path.join(combined_dir,"Test")
 for folder in folders:
     files = os.listdir(os.path.join(dataset_dir,folder))
     for file in files:
-
+        if '.ipynb_checkpoints' in file:
+                    # print("skipped")  
+            continue
         df = pd.read_csv(os.path.join(dataset_dir,folder,file),sep=",",header=0)
         df = df[offset:offset+time*50]
         X_test.append(df.values)
