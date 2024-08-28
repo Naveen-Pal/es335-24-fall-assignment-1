@@ -3,6 +3,11 @@ You can add your own functions here according to your decision tree implementati
 There is no restriction on following the below template, these fucntions are here to simply help you.
 """
 
+"""
+You can add your own functions here according to your decision tree implementation.
+There is no restriction on following the below template, these fucntions are here to simply help you.
+"""
+
 import pandas as pd
 import numpy as np
 from typing import Tuple, Union
@@ -78,45 +83,6 @@ def opt_split_attribute(X: pd.DataFrame, y: pd.Series, criterion='information_ga
             best_feature = feature
     
     return best_feature
-
-def opt_split_real(X: pd.DataFrame, y: pd.Series, criterion: str) -> Tuple[str, float]:
-    """
-    Function to find the best split for continuous features.
-    """
-    best_gain = -np.inf
-    best_split = None
-    best_feature = None
-
-    for feature in X.columns:
-        sorted_values = np.sort(X[feature].unique())
-        split_candidates = (sorted_values[:-1] + sorted_values[1:]) / 2
-
-        for split_val in split_candidates:
-            left_y = y[X[feature] <= split_val]
-            right_y = y[X[feature] > split_val]
-
-            if criterion == "information_gain":
-                parent_criterion = entropy(y)
-                left_criterion = entropy(left_y)
-                right_criterion = entropy(right_y)
-            elif criterion == "gini_index":
-                parent_criterion = gini_index(y)
-                left_criterion = gini_index(left_y)
-                right_criterion = gini_index(right_y)
-            else:
-                raise ValueError(f"Unknown criterion: {criterion}")
-
-            gain = parent_criterion - (
-                (len(left_y) / len(y)) * left_criterion +
-                (len(right_y) / len(y)) * right_criterion
-            )
-
-            if gain > best_gain:
-                best_gain = gain
-                best_split = split_val
-                best_feature = feature
-
-    return best_feature, best_split
 
 def split_data(X: pd.DataFrame, y: pd.Series, feature: str, value: Union[str, float]) -> Tuple[pd.DataFrame, pd.Series]:
     """
